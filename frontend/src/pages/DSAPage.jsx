@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { dsaService } from '../../services/api';
-import ProgressBar from '../../components/common/ProgressBar';
-import EmptyState from '../../components/common/EmptyState';
-import Spinner from '../../components/common/Spinner';
+import { dsaService } from '../services/api';
+import ProgressBar from '../components/common/ProgressBar';
+import EmptyState from '../components/common/EmptyState';
+import Spinner from '../components/common/Spinner';
 import toast from 'react-hot-toast';
 
 const TOPICS = ['Arrays', 'Strings', 'Linked List', 'Stack & Queue', 'Hashing', 'Trees', 'Graphs', 'Dynamic Programming'];

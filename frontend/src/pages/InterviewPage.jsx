@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { aiService } from '../../services/api';
+import { aiService } from '../services/api';
 import toast from 'react-hot-toast';
 
 const ChatIcon = (p) => (

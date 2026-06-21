@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { dashboardService } from '../../services/api';
-import StatCard from '../../components/common/StatCard';
-import ProgressBar from '../../components/common/ProgressBar';
-import StatusBadge from '../../components/common/StatusBadge';
-import Spinner from '../../components/common/Spinner';
+import { useAuth } from '../context/AuthContext';
+import { dashboardService } from '../services/api';
+import StatCard from '../components/common/StatCard';
+import ProgressBar from '../components/common/ProgressBar';
+import StatusBadge from '../components/common/StatusBadge';
+import Spinner from '../components/common/Spinner';
 import toast from 'react-hot-toast';
 
 const BriefcaseIcon = (p) => (

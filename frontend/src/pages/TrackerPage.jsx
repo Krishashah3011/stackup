@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { applicationService } from '../../services/api';
-import StatusBadge from '../../components/common/StatusBadge';
-import EmptyState from '../../components/common/EmptyState';
-import Spinner from '../../components/common/Spinner';
+import { applicationService } from '../services/api';
+import StatusBadge from '../components/common/StatusBadge';
+import EmptyState from '../components/common/EmptyState';
+import Spinner from '../components/common/Spinner';
 import toast from 'react-hot-toast';
 
 const STATUSES = ['All', 'Applied', 'OA Scheduled', 'OA Cleared', 'Interview Scheduled', 'Selected', 'Rejected'];

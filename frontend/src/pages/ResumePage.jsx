@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
-import { aiService } from '../../services/api';
-import ProgressBar from '../../components/common/ProgressBar';
+import { aiService } from '../services/api';
+import ProgressBar from '../components/common/ProgressBar';
 import toast from 'react-hot-toast';
 
 const DocumentIcon = (p) => (
