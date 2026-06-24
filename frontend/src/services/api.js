@@ -62,10 +62,13 @@ export const dashboardService = {
 
 // ─── DSA ──────────────────────────────────────────────────────────────────────
 export const dsaService = {
-  getAll:  ()         => api.get('/dsa'),
-  create:  (data)     => api.post('/dsa', data),
-  update:  (id, data) => api.put(`/dsa/${id}`, data),
-  delete:  (id)       => api.delete(`/dsa/${id}`),
+  getSummary:  ()           => api.get('/dsa/summary'),
+  getAll:      ()           => api.get('/dsa'),
+  create:      (data)       => api.post('/dsa', data),
+  bulkCreate:  (topics)     => api.post('/dsa/bulk', { topics }),
+  update:      (id, data)   => api.put(`/dsa/${id}`, data),
+  increment:   (id)         => api.patch(`/dsa/${id}/increment`),
+  delete:      (id)         => api.delete(`/dsa/${id}`),
 };
 
 // ─── Aptitude ─────────────────────────────────────────────────────────────────
