@@ -1,20 +1,22 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import GuestRoute from './components/common/GuestRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 
 // Public pages
-import LoginPage from './pages/LoginPage';
+import LoginPage    from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Protected pages
 import DashboardPage from './pages/DashboardPage';
-import TrackerPage from './pages/TrackerPage';
-import DSAPage from './pages/DSAPage';
-import AptitudePage from './pages/AptitudePage';
+import TrackerPage   from './pages/TrackerPage';
+import DSAPage       from './pages/DSAPage';
+import AptitudePage  from './pages/AptitudePage';
 import InterviewPage from './pages/InterviewPage';
-import ResumePage from './pages/ResumePage';
+import ResumePage    from './pages/ResumePage';
+import ProfilePage   from './pages/ProfilePage';
 
 const App = () => {
   return (
@@ -23,9 +25,23 @@ const App = () => {
         {/* Root redirect */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* Public routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        {/* Public-only routes — redirect to /dashboard if already logged in */}
+        <Route
+          path="/login"
+          element={
+            <GuestRoute>
+              <LoginPage />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <GuestRoute>
+              <RegisterPage />
+            </GuestRoute>
+          }
+        />
 
         {/* Protected routes — all share DashboardLayout */}
         <Route
@@ -36,11 +52,12 @@ const App = () => {
           }
         >
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/tracker" element={<TrackerPage />} />
-          <Route path="/dsa" element={<DSAPage />} />
-          <Route path="/aptitude" element={<AptitudePage />} />
+          <Route path="/tracker"   element={<TrackerPage />} />
+          <Route path="/dsa"       element={<DSAPage />} />
+          <Route path="/aptitude"  element={<AptitudePage />} />
           <Route path="/interview" element={<InterviewPage />} />
-          <Route path="/resume" element={<ResumePage />} />
+          <Route path="/resume"    element={<ResumePage />} />
+          <Route path="/profile"   element={<ProfilePage />} />
         </Route>
 
         {/* 404 */}

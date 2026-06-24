@@ -8,7 +8,7 @@ const api = axios.create({
   timeout: 30000,
 });
 
-// Attach token to every request
+// ── Request interceptor: attach JWT ─────────────────────────────────────────
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('stackup_token');
@@ -18,14 +18,19 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle auth errors globally
+// ── Response interceptor: handle 401 globally ────────────────────────────────
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('stackup_token');
-      localStorage.removeItem('stackup_user');
-      window.location.href = '/login';
+      // Only redirect if we actually have a stored token
+      // (avoids redirect loop on the login page itself)
+      const token = localStorage.getItem('stackup_token');
+      if (token) {
+        localStorage.removeItem('stackup_token');
+        localStorage.removeItem('stackup_user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -33,17 +38,21 @@ api.interceptors.response.use(
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 export const authService = {
-  register: (data) => api.post('/auth/register', data),
-  login: (data) => api.post('/auth/login', data),
-  getProfile: () => api.get('/auth/profile'),
+  register:      (data) => api.post('/auth/register', data),
+  login:         (data) => api.post('/auth/login', data),
+  getProfile:    ()     => api.get('/auth/profile'),
+  updateProfile: (data) => api.put('/auth/profile', data),
+  deleteAccount: (data) => api.delete('/auth/profile', { data }),
 };
 
 // ─── Applications ─────────────────────────────────────────────────────────────
 export const applicationService = {
-  getAll: (params) => api.get('/applications', { params }),
-  create: (data) => api.post('/applications', data),
-  update: (id, data) => api.put(`/applications/${id}`, data),
-  delete: (id) => api.delete(`/applications/${id}`),
+  getStats: ()           => api.get('/applications/stats'),
+  getAll:   (params)     => api.get('/applications', { params }),
+  getOne:   (id)         => api.get(`/applications/${id}`),
+  create:   (data)       => api.post('/applications', data),
+  update:   (id, data)   => api.put(`/applications/${id}`, data),
+  delete:   (id)         => api.delete(`/applications/${id}`),
 };
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
@@ -53,18 +62,18 @@ export const dashboardService = {
 
 // ─── DSA ──────────────────────────────────────────────────────────────────────
 export const dsaService = {
-  getAll: () => api.get('/dsa'),
-  create: (data) => api.post('/dsa', data),
-  update: (id, data) => api.put(`/dsa/${id}`, data),
-  delete: (id) => api.delete(`/dsa/${id}`),
+  getAll:  ()         => api.get('/dsa'),
+  create:  (data)     => api.post('/dsa', data),
+  update:  (id, data) => api.put(`/dsa/${id}`, data),
+  delete:  (id)       => api.delete(`/dsa/${id}`),
 };
 
 // ─── Aptitude ─────────────────────────────────────────────────────────────────
 export const aptitudeService = {
-  getAll: () => api.get('/aptitude'),
-  create: (data) => api.post('/aptitude', data),
-  update: (id, data) => api.put(`/aptitude/${id}`, data),
-  delete: (id) => api.delete(`/aptitude/${id}`),
+  getAll:  ()         => api.get('/aptitude'),
+  create:  (data)     => api.post('/aptitude', data),
+  update:  (id, data) => api.put(`/aptitude/${id}`, data),
+  delete:  (id)       => api.delete(`/aptitude/${id}`),
 };
 
 // ─── AI ───────────────────────────────────────────────────────────────────────
