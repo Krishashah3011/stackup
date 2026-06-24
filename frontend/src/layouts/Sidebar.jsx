@@ -129,7 +129,15 @@ const Sidebar = ({ mobileOpen, onClose }) => {
 
       {/* User footer */}
       <div className="px-3 py-4 border-t border-slate-800">
-        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-800/50">
+        <NavLink
+          to="/profile"
+          onClick={onClose}
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 ${
+              isActive ? 'bg-primary-600/20 border border-primary-500/30' : 'bg-slate-800/50 hover:bg-slate-800'
+            }`
+          }
+        >
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
             {initials}
           </div>
@@ -138,16 +146,16 @@ const Sidebar = ({ mobileOpen, onClose }) => {
             <p className="text-slate-500 text-xs truncate">{user?.email}</p>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleLogout(); }}
             title="Logout"
-            className="text-slate-500 hover:text-red-400 transition-colors flex-shrink-0"
+            className="text-slate-500 hover:text-red-400 transition-colors flex-shrink-0 p-1 rounded"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
           </button>
-        </div>
+        </NavLink>
       </div>
     </div>
   );
