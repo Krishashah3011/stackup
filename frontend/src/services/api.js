@@ -73,20 +73,30 @@ export const dsaService = {
 
 // ─── Aptitude ─────────────────────────────────────────────────────────────────
 export const aptitudeService = {
-  getAll:  ()         => api.get('/aptitude'),
-  create:  (data)     => api.post('/aptitude', data),
-  update:  (id, data) => api.put(`/aptitude/${id}`, data),
-  delete:  (id)       => api.delete(`/aptitude/${id}`),
+  getSummary:  ()              => api.get('/aptitude/summary'),
+  getAll:      ()              => api.get('/aptitude'),
+  create:      (data)          => api.post('/aptitude', data),
+  bulkCreate:  (categories)    => api.post('/aptitude/bulk', { categories }),
+  update:      (id, data)      => api.put(`/aptitude/${id}`, data),
+  logSession:  (id, data)      => api.patch(`/aptitude/${id}/session`, data),
+  delete:      (id)            => api.delete(`/aptitude/${id}`),
 };
 
 // ─── AI ───────────────────────────────────────────────────────────────────────
 export const aiService = {
-  analyzeResume: (formData) =>
+  // Resume
+  analyzeResume:      (formData)  =>
     api.post('/ai/resume-analyze', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 60000,
     }),
-  generateInterview: (data) => api.post('/ai/interview', data),
+  getResumeHistory:   ()          => api.get('/ai/resume/history'),
+
+  // Interview
+  generateInterview:      (data)  => api.post('/ai/interview', data),
+  getInterviewHistory:    (params)=> api.get('/ai/interview/history', { params }),
+  getInterviewSession:    (id)    => api.get(`/ai/interview/${id}`),
+  deleteInterviewSession: (id)    => api.delete(`/ai/interview/${id}`),
 };
 
 export default api;
