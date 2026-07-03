@@ -1,36 +1,33 @@
-const StatCard = ({ title, value, subtitle, icon: Icon, color = 'primary', trend }) => {
-  const colors = {
-    primary: { bg: 'bg-primary-500/10', text: 'text-primary-400', border: 'border-primary-500/20' },
-    green:   { bg: 'bg-green-500/10',   text: 'text-green-400',   border: 'border-green-500/20' },
-    red:     { bg: 'bg-red-500/10',     text: 'text-red-400',     border: 'border-red-500/20' },
-    yellow:  { bg: 'bg-yellow-500/10',  text: 'text-yellow-400',  border: 'border-yellow-500/20' },
-    purple:  { bg: 'bg-purple-500/10',  text: 'text-purple-400',  border: 'border-purple-500/20' },
-    accent:  { bg: 'bg-accent-500/10',  text: 'text-accent-400',  border: 'border-accent-500/20' },
-  };
+const COLOR_MAP = {
+  primary: { text: 'var(--primary)',  bg: 'color-mix(in srgb, var(--primary) 10%, transparent)', border: 'color-mix(in srgb, var(--primary) 25%, transparent)' },
+  green:   { text: 'var(--success)',  bg: 'color-mix(in srgb, #10B981 10%, transparent)',         border: 'color-mix(in srgb, #10B981 25%, transparent)'  },
+  red:     { text: 'var(--danger)',   bg: 'color-mix(in srgb, var(--danger) 10%, transparent)',   border: 'color-mix(in srgb, var(--danger) 25%, transparent)' },
+  yellow:  { text: 'var(--warning)',  bg: 'color-mix(in srgb, var(--warning) 10%, transparent)',  border: 'color-mix(in srgb, var(--warning) 25%, transparent)' },
+  purple:  { text: '#8B5CF6',         bg: 'color-mix(in srgb, #8B5CF6 10%, transparent)',         border: 'color-mix(in srgb, #8B5CF6 25%, transparent)'   },
+  accent:  { text: 'var(--success)',  bg: 'color-mix(in srgb, var(--success) 10%, transparent)',  border: 'color-mix(in srgb, var(--success) 25%, transparent)' },
+  slate:   { text: 'var(--text)',     bg: 'var(--surface-2)',                                      border: 'var(--border)' },
+};
 
-  const c = colors[color] || colors.primary;
-
+const StatCard = ({ title, value, subtitle, icon: Icon, color = 'primary' }) => {
+  const c = COLOR_MAP[color] || COLOR_MAP.primary;
   return (
-    <div className="card hover:border-slate-700 transition-all duration-200 animate-fade-in">
+    <div className="card hover:shadow-md transition-all duration-200 animate-fade-in">
       <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-slate-400 text-sm font-medium">{title}</p>
-          <p className={`text-3xl font-bold mt-1 ${c.text}`}>{value ?? '—'}</p>
-          {subtitle && <p className="text-slate-500 text-xs mt-1">{subtitle}</p>}
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: 'var(--text-3)' }}>{title}</p>
+          <p className="text-3xl font-black leading-none" style={{ color: c.text }}>{value ?? '—'}</p>
+          {subtitle && <p className="text-xs mt-1.5" style={{ color: 'var(--text-3)' }}>{subtitle}</p>}
         </div>
         {Icon && (
-          <div className={`w-11 h-11 ${c.bg} border ${c.border} rounded-xl flex items-center justify-center flex-shrink-0 ml-4`}>
-            <Icon className={`w-5 h-5 ${c.text}`} />
+          <div
+            className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ml-4"
+            style={{ background: c.bg, border: `1px solid ${c.border}` }}
+          >
+            <Icon className="w-5 h-5" style={{ color: c.text }} />
           </div>
         )}
       </div>
-      {trend !== undefined && (
-        <div className={`mt-3 text-xs font-medium ${trend >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-          {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}% from last week
-        </div>
-      )}
     </div>
   );
 };
-
 export default StatCard;

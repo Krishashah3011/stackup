@@ -1,28 +1,25 @@
+const COLOR_MAP = {
+  primary: 'linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%)',
+  accent:  'linear-gradient(90deg, #10B981 0%, #34D399 100%)',
+  green:   'linear-gradient(90deg, #10B981 0%, #34D399 100%)',
+  yellow:  'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)',
+  red:     'linear-gradient(90deg, #EF4444 0%, #F87171 100%)',
+  purple:  'linear-gradient(90deg, #8B5CF6 0%, #A78BFA 100%)',
+  blue:    'linear-gradient(90deg, #3B82F6 0%, #60A5FA 100%)',
+};
+
 const ProgressBar = ({ value = 0, max = 100, color = 'primary', showLabel = true, height = 'h-2' }) => {
   const pct = Math.min(100, Math.round((value / max) * 100));
-
-  const colors = {
-    primary: 'bg-primary-500',
-    accent: 'bg-accent-500',
-    green: 'bg-green-500',
-    yellow: 'bg-yellow-500',
-    red: 'bg-red-500',
-    purple: 'bg-purple-500',
-  };
-
   return (
     <div className="w-full">
-      <div className={`w-full bg-slate-800 rounded-full overflow-hidden ${height}`}>
+      <div className={`progress-track ${height}`}>
         <div
-          className={`${height} ${colors[color] || colors.primary} rounded-full transition-all duration-700 ease-out`}
-          style={{ width: `${pct}%` }}
+          className={`${height} rounded-full transition-all duration-700`}
+          style={{ width: `${pct}%`, background: COLOR_MAP[color] || COLOR_MAP.primary }}
         />
       </div>
-      {showLabel && (
-        <p className="text-xs text-slate-400 mt-1 text-right">{pct}%</p>
-      )}
+      {showLabel && <p className="text-xs mt-1 text-right" style={{ color: 'var(--text-3)' }}>{pct}%</p>}
     </div>
   );
 };
-
 export default ProgressBar;
