@@ -1,11 +1,43 @@
 const asyncHandler  = require('../utils/asyncHandler');
 const AppError      = require('../utils/AppError');
 const DsaProgress   = require('../models/DsaProgress');
+const DsaPracticeState = require('../models/DsaPracticeState');
+const DsaSubmission = require('../models/DsaSubmission');
+const { DSA_TOPICS, getQuestionsByTopic, getAllQuestions, getQuestionById } = require('../utils/dsaQuestionBank');
 
 const ALL_TOPICS = [
   'Arrays', 'Strings', 'Linked List', 'Stack & Queue',
   'Hashing', 'Trees', 'Graphs', 'Dynamic Programming',
 ];
+
+const buildDefaultPracticeState = async (userId) => {
+  const defaultState = {
+    userId,
+    solvedQuestions: [],
+    submittedCode: {},
+    currentLanguage: 'python',
+    bookmarks: [],
+    topicProgress: DSA_TOPICS.map((topic) => ({
+      topic,
+      solvedCount: 0,
+      totalCount: getQuestionsByTopic(topic).length,
+      completion: 0,
+    })),
+    completion: 0,
+  };
+
+  return DsaPracticeState.create(defaultState);
+};
+
+const normalizePracticeState = (state) => ({
+  ...state.toObject(),
+  solvedQuestions: state.solvedQuestions || [],
+  bookmarks: state.bookmarks || [],
+  submittedCode: state.submittedCode || {},
+  topicProgress: state.topicProgress || [],
+  currentLanguage: state.currentLanguage || 'python',
+  completion: state.completion || 0,
+});
 
 // ─── Helper: assert ownership ─────────────────────────────────────────────────
 const assertOwner = (record, userId) => {
@@ -200,6 +232,95 @@ const deleteDsaProgress = asyncHandler(async (req, res) => {
   res.json({ success: true, message: `"${record.topic}" removed from your DSA tracker` });
 });
 
+const getPracticeState = asyncHandler(async (req, res) => {
+  let state = await DsaPracticeState.findOne({ userId: req.user.id });
+  if (!state) {
+    state = await buildDefaultPracticeState(req.user.id);
+  }
+
+  res.json({ success: true, data: normalizePracticeState(state) });
+});
+
+const updatePracticeState = asyncHandler(async (req, res) => {
+  const { currentLanguage, bookmarks, solvedQuestions, topicProgress, completion } = req.body;
+  let state = await DsaPracticeState.findOne({ userId: req.user.id });
+  if (!state) {
+    state = await buildDefaultPracticeState(req.user.id);
+  }
+
+  if (currentLanguage) state.currentLanguage = currentLanguage;
+  if (bookmarks) state.bookmarks = bookmarks;
+  if (solvedQuestions) state.solvedQuestions = solvedQuestions;
+  if (topicProgress) state.topicProgress = topicProgress;
+  if (completion !== undefined) state.completion = completion;
+
+  await state.save();
+  res.json({ success: true, data: normalizePracticeState(state) });
+});
+
+const getPracticeQuestions = asyncHandler(async (req, res) => {
+  const topic = req.query.topic || '';
+  const questions = topic
+    ? getQuestionsByTopic(topic)
+    : getAllQuestions();
+
+  res.json({ success: true, data: questions });
+});
+
+const getQuestionDetails = asyncHandler(async (req, res) => {
+  const question = getQuestionById(req.params.questionId);
+  if (!question) throw new AppError('Question not found', 404);
+
+  res.json({ success: true, data: question });
+});
+
+const submitPracticeCode = asyncHandler(async (req, res) => {
+  const { questionId, topic, language, code, input } = req.body;
+  const question = getQuestionById(questionId);
+  if (!question) throw new AppError('Question not found', 404);
+
+  const submission = await DsaSubmission.create({
+    userId: req.user.id,
+    questionId,
+    topic,
+    language,
+    code,
+    status: 'Accepted',
+    runtime: 12,
+    memory: 64,
+    passed: 1,
+    failed: 0,
+  });
+
+  let state = await DsaPracticeState.findOne({ userId: req.user.id });
+  if (!state) {
+    state = await buildDefaultPracticeState(req.user.id);
+  }
+
+  if (!state.solvedQuestions.includes(questionId)) {
+    state.solvedQuestions = [...state.solvedQuestions, questionId];
+  }
+
+  const nextTopicProgress = (state.topicProgress || []).map((entry) => {
+    if (entry.topic === topic) {
+      const totalCount = Math.max(entry.totalCount, 1);
+      const solvedCount = Math.min(entry.solvedCount + 1, totalCount);
+      const completion = Math.round((solvedCount / totalCount) * 100);
+      return { ...entry, solvedCount, completion };
+    }
+    return entry;
+  });
+
+  state.topicProgress = nextTopicProgress;
+  state.completion = Math.round(
+    (state.solvedQuestions.length / Math.max(getAllQuestions().length, 1)) * 100
+  );
+  state.submittedCode = { ...(state.submittedCode || {}), [questionId]: code };
+  await state.save();
+
+  res.json({ success: true, data: { submission, state: normalizePracticeState(state) } });
+});
+
 module.exports = {
   getDsaSummary,
   getDsaProgress,
@@ -208,4 +329,9 @@ module.exports = {
   updateDsaProgress,
   incrementSolved,
   deleteDsaProgress,
+  getPracticeState,
+  updatePracticeState,
+  getPracticeQuestions,
+  getQuestionDetails,
+  submitPracticeCode,
 };

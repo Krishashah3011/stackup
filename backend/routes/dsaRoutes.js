@@ -8,6 +8,11 @@ const {
   updateDsaProgress,
   incrementSolved,
   deleteDsaProgress,
+  getPracticeState,
+  updatePracticeState,
+  getPracticeQuestions,
+  getQuestionDetails,
+  submitPracticeCode,
 } = require('../controllers/dsaController');
 const { protect } = require('../middleware/auth');
 const validate    = require('../middleware/validate');
@@ -24,6 +29,34 @@ const VALID_TOPICS = [
 
 // ── Summary ───────────────────────────────────────────────────────────────────
 router.get('/summary', getDsaSummary);
+
+// ── Practice experience ─────────────────────────────────────────────────────
+router.get('/practice/state', getPracticeState);
+router.put(
+  '/practice/state',
+  [
+    body('currentLanguage').optional().isString(),
+    body('bookmarks').optional().isArray(),
+    body('solvedQuestions').optional().isArray(),
+    body('topicProgress').optional().isArray(),
+    body('completion').optional().isInt({ min: 0, max: 100 }),
+  ],
+  validate,
+  updatePracticeState
+);
+router.get('/practice/questions', getPracticeQuestions);
+router.get('/practice/questions/:questionId', getQuestionDetails);
+router.post(
+  '/practice/submit',
+  [
+    body('questionId').isString().notEmpty(),
+    body('topic').isString().notEmpty(),
+    body('language').isString().notEmpty(),
+    body('code').isString().notEmpty(),
+  ],
+  validate,
+  submitPracticeCode
+);
 
 // ── Bulk add ──────────────────────────────────────────────────────────────────
 router.post(

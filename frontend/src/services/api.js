@@ -8,7 +8,6 @@ const api = axios.create({
   timeout: 30000,
 });
 
-// ── Request interceptor: attach JWT ─────────────────────────────────────────
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('stackup_token');
@@ -18,13 +17,10 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ── Response interceptor: handle 401 globally ────────────────────────────────
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Only redirect if we actually have a stored token
-      // (avoids redirect loop on the login page itself)
       const token = localStorage.getItem('stackup_token');
       if (token) {
         localStorage.removeItem('stackup_token');
@@ -36,7 +32,6 @@ api.interceptors.response.use(
   }
 );
 
-// ─── Auth ─────────────────────────────────────────────────────────────────────
 export const authService = {
   register:      (data) => api.post('/auth/register', data),
   login:         (data) => api.post('/auth/login', data),
@@ -45,7 +40,6 @@ export const authService = {
   deleteAccount: (data) => api.delete('/auth/profile', { data }),
 };
 
-// ─── Applications ─────────────────────────────────────────────────────────────
 export const applicationService = {
   getStats: ()           => api.get('/applications/stats'),
   getAll:   (params)     => api.get('/applications', { params }),
@@ -55,12 +49,10 @@ export const applicationService = {
   delete:   (id)         => api.delete(`/applications/${id}`),
 };
 
-// ─── Dashboard ────────────────────────────────────────────────────────────────
 export const dashboardService = {
   getStats: () => api.get('/dashboard'),
 };
 
-// ─── DSA ──────────────────────────────────────────────────────────────────────
 export const dsaService = {
   getSummary:  ()           => api.get('/dsa/summary'),
   getAll:      ()           => api.get('/dsa'),
@@ -69,9 +61,13 @@ export const dsaService = {
   update:      (id, data)   => api.put(`/dsa/${id}`, data),
   increment:   (id)         => api.patch(`/dsa/${id}/increment`),
   delete:      (id)         => api.delete(`/dsa/${id}`),
+  getPracticeState: () => api.get('/dsa/practice/state'),
+  updatePracticeState: (data) => api.put('/dsa/practice/state', data),
+  getPracticeQuestions: (topic) => api.get('/dsa/practice/questions', { params: { topic } }),
+  getQuestionDetails: (questionId) => api.get(`/dsa/practice/questions/${questionId}`),
+  submitPracticeCode: (data) => api.post('/dsa/practice/submit', data),
 };
 
-// ─── Aptitude ─────────────────────────────────────────────────────────────────
 export const aptitudeService = {
   getSummary:  ()              => api.get('/aptitude/summary'),
   getAll:      ()              => api.get('/aptitude'),
@@ -82,17 +78,13 @@ export const aptitudeService = {
   delete:      (id)            => api.delete(`/aptitude/${id}`),
 };
 
-// ─── AI ───────────────────────────────────────────────────────────────────────
 export const aiService = {
-  // Resume
   analyzeResume:      (formData)  =>
     api.post('/ai/resume-analyze', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 60000,
     }),
   getResumeHistory:   ()          => api.get('/ai/resume/history'),
-
-  // Interview
   generateInterview:      (data)  => api.post('/ai/interview', data),
   getInterviewHistory:    (params)=> api.get('/ai/interview/history', { params }),
   getInterviewSession:    (id)    => api.get(`/ai/interview/${id}`),

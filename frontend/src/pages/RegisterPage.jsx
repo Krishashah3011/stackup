@@ -7,18 +7,18 @@ import toast from 'react-hot-toast';
 // ── Defined OUTSIDE the page component so React never remounts it ─────────────
 const FloatField = ({ id, label, type = 'text', value, onChange, error, autoComplete }) => (
   <div>
-    <div className="float-group">
-      <input
-        id={id}
-        type={type}
-        placeholder={label}
-        className={`float-input ${error ? 'error' : ''}`}
-        value={value}
-        onChange={onChange}
-        autoComplete={autoComplete}
-      />
-      <label htmlFor={id} className="float-label">{label}</label>
-    </div>
+  <>
+  <label className="label">{label}</label>
+
+  <input
+    id={id}
+    type={type}
+    className={`input-field ${error ? 'error' : ''}`}
+    value={value}
+    onChange={onChange}
+    autoComplete={autoComplete}
+  />
+  </>
     {error && (
       <p className="text-xs mt-1.5 ml-1" style={{ color: 'var(--danger)' }}>{error}</p>
     )}
